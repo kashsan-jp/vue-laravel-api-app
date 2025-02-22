@@ -37,7 +37,8 @@ class PostController extends Controller implements HasMiddleware
 
        $post = $request->user()->posts()->create($fields);
 
-       return $post;
+    //    return $post;
+        return ['post' => $post, 'user' => $post->user];
         
     }
 
@@ -71,7 +72,7 @@ class PostController extends Controller implements HasMiddleware
     public function destroy(Post $post)
     {
         Gate::authorize('modify', $post);
-        
+
         $post->delete();
 
         return [ 'message' => 'The post was deleted'];

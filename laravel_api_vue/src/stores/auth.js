@@ -11,6 +11,23 @@ export const useAuthStore = defineStore('authStore', {
     //     userAge: (state) => `${state.user} is 64`
     // },
     actions: {
+
+        // Get authenticated user
+        async getUser() {
+            if(localStorage.getItem('token')) {
+                const res = await fetch('/api/user',{
+                    headers: {
+                        authorization:`Bearer ${localStorage.getItem('token')}`,
+                    },
+                });
+                const data = await res.json()
+                if(res.ok) {
+                    this.user = data
+                }
+                // console.log(data);
+            }
+        },
+        // Login or Register user
        async authenticate(apiRoute,formData) {
             const res = await fetch(`/api/${apiRoute}`, {
                 method: 'post',
@@ -22,10 +39,31 @@ export const useAuthStore = defineStore('authStore', {
                 this.errors = data.errors
             } else {
                 // console.log(data);
+                this.errors = {};
                 localStorage.setItem('token', data.token);
                 this.user = data.user;
                 this.router.push({name: 'home'});
             }
         },
+
+        // Logout user
+        async logout() {
+            const res = await fetch('/api/logout', {
+                method: 'post',
+                headers: {
+                    authorization:`Bearer ${localStorage.getItem('token')}`,
+                },
+            })
+
+            const data = await res.json()
+            console.log(data);
+
+            if(res.ok) {
+                this.user = null
+                this.error = {}
+                localStorage.removeItem('token')
+                this.router.push({name: 'home'});
+            }
+        }
     },
 });
